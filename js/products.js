@@ -1,21 +1,41 @@
 window.Shop = {
-  apiURL: "http://localhost:8082",
+    apiURL: "http://localhost:8082",
 
+    addProductToCart: function (productId) {
+
+
+        var data = {
+
+            'customerId': 1,
+            'productIds': [productId]
+        };
+
+        $.ajax({
+            url: Shop.apiURL + "carts",
+            method: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(data)
+        }).done(function (response) {
+            console.log(response);
+
+
+        });
+    },
     getProducts: function () {
         $.ajax({
-            url: Shop.apiURL,
+            url: Shop.apiURL + "/products",
             method: "GET"
         }).done(function (response) {
             console.log(response);
             //  reload items table
 
-            Shop.displayProducts(response)
+            Shop.displayProducts(response.content);
 
         });
     },
 
     getProductDiv: function (product) {
-      return ` <div class="col-md-3 col-sm-6">
+        return ` <div class="col-md-3 col-sm-6">
                     <div class="single-shop-product">
                         <div class="product-upper">
                             <img src="img/product-2.jpg" alt="">
@@ -26,9 +46,10 @@ window.Shop = {
                         </div>  
                         
                         <div class="product-option-shop">
-                            <a class="add_to_cart_button" data-quantity="1" data-product_sku="" data-product_id="70" rel="nofollow" href="/canvas/shop/?add-to-cart=70">Add to cart</a>
+                            <a class="add_to_cart_button" data-quantity="1" data-product_sku="" data-product_id="${product.id}" rel="nofollow" href="/online_shop_web_client/cart.html">Add to cart</a>
                         </div>                       
-                    </div>`
+                    </div>
+</div>`
     },
     displayProducts: function (products) {
         console.log('Displaying products');
@@ -40,7 +61,17 @@ window.Shop = {
 
         $('#products-row').html(divs);
     },
+    bindEvents: function () {
+        $('products-row').delegate('.add_to_cart_button', 'click', function () {
+            var id = $(this) .data('product_id');
+
+            Shop.addProductToCart(id);
+
+        });
+    }
+
 
 };
 
 Shop.getProducts();
+Shop.bindEvents();
